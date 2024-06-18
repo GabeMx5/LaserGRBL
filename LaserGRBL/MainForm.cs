@@ -188,7 +188,7 @@ namespace LaserGRBL
             {
                 questionMarkToolStripMenuItem.Text = "?";
             }
-            AddIn.AddInManager.LoadAddIns(addInToolStripMenuItem);
+            AddIn.AddInManager.LoadAddIns(addInToolStripMenuItem, Core);
             RefreshColorSchema(); //include RefreshOverride();
 			RefreshFormTitle();
 		}
