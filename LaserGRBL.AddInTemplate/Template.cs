@@ -41,7 +41,7 @@ namespace LaserGRBL.AddInTemplate
                         Data.Power = Math.Round(state.Gamepad.RightTrigger / 256.0, 1);
                         if (Data.IsChanged)
                         {
-                            SendImmediate(0x85);
+                            SendImmediate(0x85, true);
                             if (Data.IsPowerChanged) EnqueueCommand($"S{ScaleValue(Data.Power, 1000)}");
                             if (!Data.IsZeroPosition) EnqueueCommand($"$J=G91X{Data.X * 5000}Y{Data.Y * 5000}F{ScaleValue(distance, 5000)}");
                         }
@@ -76,7 +76,7 @@ namespace LaserGRBL.AddInTemplate
 
         private double Quantize(double value)
         {
-            return Math.Round(value * (Config.MaxSteps * 1f), 0) / Config.MaxSteps;
+            return Math.Round(value * Config.MaxSteps, 0) / Config.MaxSteps;
         }
 
         private void PrivateItem_Click(object sender, System.EventArgs e)

@@ -9,6 +9,6 @@ namespace LaserGRBL.AddInTemplate
     {
         public float Tolerance { get; set; } = 4000;
 
-        public int MaxSteps { get; set; } = 10;
+        public int MaxSteps { get; set; } = 20;
     }
 }
