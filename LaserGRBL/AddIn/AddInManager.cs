@@ -61,6 +61,7 @@ namespace LaserGRBL.AddIn
                                 // create the AddIn instance
                                 AddIn addIn = (AddIn)Activator.CreateInstance(type, new object[] { addInMenuItem });
                                 addIn.OnEnqueueCommand += (command) => core.EnqueueCommand(new GrblCommand(command));
+                                addIn.OnSendImmediate += (b, mute) => core.SendImmediate(b, mute);
                                 // add the AddIn to the list
                                 mAddIns.Add(addIn);
                                 showAddInMenu = true;
