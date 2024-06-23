@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Threading;
 using System.Windows.Forms;
+using Tools;
 using static LaserGRBL.ProgramRange;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -536,8 +537,10 @@ namespace LaserGRBL.UserControls
             double wRatio = Width / (mCamera.Right - mCamera.Left);
 			// unit of measure
 			string uom = string.Empty;
+
+			HumanReadableLength(0, worldWidth, out uom); //call it just to be sure to have uom loaded by worldWidth
 			// draw horizontal
-			for (int i = (int)mCamera.Left + (int)(mPadding.Left / wRatio); i < (int)mCamera.Right - (int)(mPadding.Right / wRatio); i += 1)
+			for (int i = (int)mCamera.Left + (int)(mPadding.Left / wRatio); i <= (int)mCamera.Right - (int)(mPadding.Right / wRatio); i += 1)
 			{
 				if (i % step == 0)
 				{
@@ -551,7 +554,7 @@ namespace LaserGRBL.UserControls
 			// get ratio
 			double hRatio = Height / (mCamera.Top - mCamera.Bottom);
 			// draw vertical
-			for (int i = (int)mCamera.Bottom + (int)(mPadding.Bottom / hRatio); i < (int)mCamera.Top - (int)(mPadding.Top / hRatio); i += 1)
+			for (int i = (int)mCamera.Bottom + (int)(mPadding.Bottom / hRatio); i <= (int)mCamera.Top - (int)(mPadding.Top / hRatio); i += 1)
 			{
 				if (i % step == 0)
 				{
@@ -562,9 +565,23 @@ namespace LaserGRBL.UserControls
                     DrawText(text, x, y);
                 }
             }
-            // draw unit of measure
-            SizeF uomSizeProp = MeasureOpenGlText(uom);
-            DrawText(uom, mPadding.Left - uomSizeProp.Width, mPadding.Bottom - uomSizeProp.Height);
+
+			// Draw a masking rectangle where to put measure unit, so ruler numbers does not overlap
+			GLColor color = new GLColor();
+			color.FromColor(mBackgroundColor);
+			OpenGL.Color(color);
+
+			OpenGL.Begin(OpenGL.GL_QUADS);
+			OpenGL.Vertex(mCamera.Left, mCamera.Bottom);
+			OpenGL.Vertex(mCamera.Left + mPadding.Left / hRatio, mCamera.Bottom);
+			OpenGL.Vertex(mCamera.Left + mPadding.Left / hRatio, mCamera.Bottom + mPadding.Bottom / hRatio);
+			OpenGL.Vertex(mCamera.Left, mCamera.Bottom + mPadding.Bottom / hRatio);
+			OpenGL.End();
+
+			// draw unit of measure
+			SizeF uomSizeProp = MeasureOpenGlText(uom);
+			DrawText(uom, mPadding.Left - uomSizeProp.Width -20, mPadding.Bottom - uomSizeProp.Height);
+
             OpenGL.Flush();
 		}
 
@@ -704,7 +721,7 @@ namespace LaserGRBL.UserControls
 					e.Graphics.DrawString(text, font, b, point.X, point.Y);
 				}
 
-				if (!Core.HasProgram)
+				if (mGrbl3D == null)
 				{
 					text = $"{Strings.TipsBasicUsage}\r\n{Strings.TipsZoom}\r\n{Strings.TipsPan}\r\n{Strings.TipsJog}\r\n\r\n";
                     string shortcut = "";
@@ -833,13 +850,14 @@ namespace LaserGRBL.UserControls
 			Core.OnFileLoaded += OnFileLoaded;
 			Core.ShowExecutedCommands.OnChange += ShowExecutedCommands_OnChange;
 			Core.PreviewLineSize.OnChange += PrerviewLineSize_OnChange;
+			Core.ShowLaserOffMovements.OnChange += ShowLaserOffMovements_OnChange;
 			Core.OnAutoSizeDrawing += Core_OnAutoSizeDrawing;
 			Core.OnZoomInDrawing += Core_OnZoomInDrawing;
 			Core.OnZoomOutDrawing += Core_OnZoomOutDrawing;
 			Core.OnProgramEnded += OnProgramEnded;
 		}
 
-        private void OnFileLoading(long elapsed, string filename)
+		private void OnFileLoading(long elapsed, string filename)
         {
 			mMessage = Strings.Loading;
         }
@@ -870,9 +888,20 @@ namespace LaserGRBL.UserControls
 		{
 			if (mGrbl3D != null) mGrbl3D.LineWidth = obj.Value;
 			mInvalidateAll = true;
+			RR.Set();
 		}
 
-		private void ShowExecutedCommands_OnChange(Tools.RetainedSetting<bool> obj) => mInvalidateAll = true;
+		private void ShowLaserOffMovements_OnChange(RetainedSetting<bool> obj)
+		{
+			mInvalidateAll = true;
+			RR.Set();
+		}
+
+		private void ShowExecutedCommands_OnChange(Tools.RetainedSetting<bool> obj)
+		{
+			mInvalidateAll = true;
+			RR.Set();
+		}
 
 		private void DisposeGrbl3D()
 		{
