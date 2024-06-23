@@ -2,58 +2,15 @@
 {
     public class Data
     {
-        private double mX = 0;
-        private bool mIsChanged = false;
-        public double X {
-            get => mX;
-            set
-            {
-                if (value != mX)
-                {
-                    mX = value;
-                    mIsChanged = true;
-                }
-            }
-        }
+        public ChangingVar<double> X = new ChangingVar<double>();
+        public ChangingVar<double> Y = new ChangingVar<double>();
+        public ChangingVar<double> Power = new ChangingVar<double>();
 
-        private double mY = 0;
-        public double Y {
-            get => mY;
-            set
-            {
-                if (value != mY)
-                {
-                    mY = value;
-                    mIsChanged = true;
-                }
-            }
-        }
+        public bool IsChanged => X.IsChanged || Y.IsChanged || Power.IsChanged;
 
-        private bool mPowerChanged = false;
-        private double mPower = 0;
-        public double Power {
-            get => mPower;
-            set
-            {
-                if (value != mPower)
-                {
-                    mPower = value;
-                    mPowerChanged = true;
-                }
-            }
-        }
+        public bool IsPowerChanged => Power.IsChanged;
 
-        public bool IsChanged => mIsChanged || mPowerChanged;
-
-        public bool IsPowerChanged => mPowerChanged;
-
-        public bool IsZeroPosition => mX == 0 && mY == 0;
-
-        public void BeginUpdate()
-        {
-            mIsChanged = false;
-            mPowerChanged = false;
-        }
+        public bool IsZeroPosition => X.Value == 0 && Y.Value == 0;
 
     }
 }

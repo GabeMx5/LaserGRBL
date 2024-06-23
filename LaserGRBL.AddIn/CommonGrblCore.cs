@@ -268,12 +268,13 @@ namespace LaserGRBL.AddIn
         }
 
         public abstract void EnqueueZJog(JogDirection dir, decimal step, bool fast);
+        public abstract void EnqueueZJog(JogDirection dir, decimal step, double speed);
 
         public abstract void BeginJog(PointF target, bool fast);
+        public abstract void BeginJog(PointF target, double speed);
 
         public abstract void BeginJog(JogDirection dir, bool fast);
-
-        public abstract void EndJogV11();
+        public abstract void BeginJog(JogDirection dir, double speed);
 
         public abstract bool CanReOpenFile { get; }
 
@@ -322,6 +323,7 @@ namespace LaserGRBL.AddIn
         public abstract void SetNewZero();
 
         public int JogSpeed { get; set; }
+
         public decimal JogStep { get; set; }
 
         public abstract bool ContinuosJogEnabled { get; }

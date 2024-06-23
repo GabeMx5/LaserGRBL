@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChangingVar.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="FormConfig.cs">

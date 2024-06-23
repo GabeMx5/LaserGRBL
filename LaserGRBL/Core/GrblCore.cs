@@ -27,7 +27,7 @@ namespace LaserGRBL
 	/// <summary>
 	/// Description of CommandThread.
 	/// </summary>
-	public class GrblCore: AddIn.CommonGrblCore
+	public class GrblCore: CommonGrblCore
 	{
 		//public static PSHelper.PSFile MaterialDB = PSHelper.PSFile.Load();
 		public static PSHelper.MaterialDB MaterialDB = PSHelper.MaterialDB.Load();
@@ -125,7 +125,7 @@ namespace LaserGRBL
 		private int mGrblBuffer = -1;
 		private int mFailedConnection = 0;
 		private JogDirection mPrenotedJogDirection = JogDirection.None;
-		private float mPrenotedJogSpeed = 100;
+		private double mPrenotedJogSpeed = 100;
 		protected TimeProjection mTP = new TimeProjection();
 
 		private MacStatus mMachineStatus = MacStatus.Disconnected;
@@ -1388,32 +1388,43 @@ namespace LaserGRBL
 
 		public override void EnqueueZJog(JogDirection dir, decimal step, bool fast)
 		{
-			if (JogEnabled)
-			{
-				mPrenotedJogSpeed = (fast ? 100000 : JogSpeed);
-
-				if (SupportTrueJogging)
-					DoJogV11(dir, step);
-				else
-					EmulateJogV09(dir, step); //immediato
-			}
+			EnqueueZJog(dir, step, fast ? 100000 : JogSpeed);
 		}
 
-		public override void BeginJog(PointF target, bool fast)
+        public override void EnqueueZJog(JogDirection dir, decimal step, double speed)
+        {
+            if (JogEnabled)
+            {
+                mPrenotedJogSpeed = speed;
+
+                if (SupportTrueJogging)
+                    DoJogV11(dir, step);
+                else
+                    EmulateJogV09(dir, step); //immediato
+            }
+        }
+
+
+        public override void BeginJog(PointF target, bool fast)
 		{
-			if (JogEnabled)
-			{
-				mPrenotedJogSpeed = (fast ? 100000 : JogSpeed);
-				target = LimitToBound(target);
-
-				if (SupportTrueJogging)
-					DoJogV11(target);
-				else
-					EmulateJogV09(target);
-			}
+            BeginJog(target, fast ? 100000 : JogSpeed);
 		}
 
-		private PointF LimitToBound(PointF target)
+        public override void BeginJog(PointF target, double speed)
+        {
+            if (JogEnabled)
+            {
+                mPrenotedJogSpeed = speed;
+                target = LimitToBound(target);
+
+                if (SupportTrueJogging)
+                    DoJogV11(target);
+                else
+                    EmulateJogV09(target);
+            }
+        }
+
+        private PointF LimitToBound(PointF target)
 		{
 			if (Configuration.SoftLimit)
 			{
@@ -1427,18 +1438,23 @@ namespace LaserGRBL
 
 		public override void BeginJog(JogDirection dir, bool fast) //da chiamare su ButtonDown
 		{
-			if (JogEnabled)
-			{
-				mPrenotedJogSpeed = (fast ? 100000 : JogSpeed);
-
-				if (SupportTrueJogging)
-					DoJogV11(dir, JogStep);
-				else
-					EmulateJogV09(dir, JogStep);
-			}
+			BeginJog(dir, fast ? 100000 : JogSpeed);
 		}
 
-		private void EmulateJogV09(JogDirection dir, decimal step) //emulate jog using plane G-Code
+        public override void BeginJog(JogDirection dir, double speed)
+        {
+            if (JogEnabled)
+            {
+                mPrenotedJogSpeed = speed;
+
+                if (SupportTrueJogging)
+                    DoJogV11(dir, JogStep);
+                else
+                    EmulateJogV09(dir, JogStep);
+            }
+        }
+
+        private void EmulateJogV09(JogDirection dir, decimal step) //emulate jog using plane G-Code
 		{
 			if (dir == JogDirection.Home)
 			{
@@ -1502,9 +1518,12 @@ namespace LaserGRBL
 		private void DoJogV11(PointF target)
 		{
 			mPrenotedJogDirection = JogDirection.None;
-			SendImmediate(0x85); //abort previous jog
-			EnqueueCommand(new GrblCommand(string.Format("$J=G90X{0}Y{1}F{2}", target.X.ToString("0.00", NumberFormatInfo.InvariantInfo), target.Y.ToString("0.00", NumberFormatInfo.InvariantInfo), mPrenotedJogSpeed)));
-		}
+			if (mPending.Count == 0)
+            {
+                SendImmediate(0x85); //abort previous jog
+                EnqueueCommand(new GrblCommand(string.Format("$J=G90X{0}Y{1}F{2}", target.X.ToString("0.00", NumberFormatInfo.InvariantInfo), target.Y.ToString("0.00", NumberFormatInfo.InvariantInfo), mPrenotedJogSpeed)));
+            }
+        }
 
 		private GrblCommand GetRelativeJogCommandv11(JogDirection dir, decimal step)
 		{
@@ -1541,7 +1560,7 @@ namespace LaserGRBL
 			return new GrblCommand(cmd);
 		}
 
-		public override void EndJogV11() //da chiamare su ButtonUp
+		internal void EndJogV11() //da chiamare su ButtonUp
 		{
 			mPrenotedJogDirection = JogDirection.Abort;
 		}

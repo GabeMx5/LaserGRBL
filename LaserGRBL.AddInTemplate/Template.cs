@@ -1,6 +1,7 @@
 ﻿using LaserGRBL.AddIn;
 using SharpDX.XInput;
 using System;
+using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -26,30 +27,41 @@ namespace LaserGRBL.AddInTemplate
             mController = new Controller(UserIndex.One);
             Task.Factory.StartNew(() =>
             {
-
+                ChangingVar<bool> buttonA = new ChangingVar<bool>();
                 while (true)
                 {
                     if (mController.IsConnected)
                     {
                         State state = mController.GetState();
-                        Data.BeginUpdate();
-                        Data.X = MapValue(state.Gamepad.LeftThumbX);
-                        Data.Y = MapValue(state.Gamepad.LeftThumbY);
-
-                        double distance = Quantize(Math.Sqrt(Math.Pow(Data.X, 2) + Math.Pow(Data.Y, 2)));
+                        buttonA.Value = (state.Gamepad.Buttons & GamepadButtonFlags.A) != 0;
+                        Data.X.Value = MapValue(state.Gamepad.LeftThumbX);
+                        Data.Y.Value = MapValue(state.Gamepad.LeftThumbY);
+                        if (buttonA.Value && !buttonA.PreviousValue)
+                        {
+                            Core.ExecuteCustombutton("M3 S[$30*10/100]\r\nG1 F1000");
+                        }
+                        if (!buttonA.Value && buttonA.PreviousValue)
+                        {
+                            Core.ExecuteCustombutton("M5 S0\r\nG0");
+                        }
+                        double distance = Quantize(Math.Sqrt(Math.Pow(Data.X.Value, 2) + Math.Pow(Data.Y.Value, 2)));
                         if (distance > 1) distance = 1;
 
-                        Data.Power = Math.Round(state.Gamepad.RightTrigger / 256.0, 1);
+                        Data.Power.Value = Math.Round(state.Gamepad.RightTrigger / 256.0, 1);
                         if (Data.IsChanged)
                         {
-                            /*
-                            SendImmediate(0x85, true);
-                            if (Data.IsPowerChanged) EnqueueCommand($"S{ScaleValue(Data.Power, 1000)}");
-                            if (!Data.IsZeroPosition) EnqueueCommand($"$J=G91X{Data.X * 5000}Y{Data.Y * 5000}F{ScaleValue(distance, 5000)}");
-                            */
+                            if (!Data.IsZeroPosition)
+                            {
+                                PointF target = new PointF((float)Data.X.Value * 5000, (float)Data.Y.Value * 5000);
+                                Core.BeginJog(target, ScaleValue(distance, 5000));
+                            }
+                            else
+                            {
+                                Core.BeginJog(CommonGrblCore.JogDirection.Abort, true);
+                            }
                         }
                     }
-                    System.Threading.Thread.Sleep(200);
+                    System.Threading.Thread.Sleep(50);
                 }
             });
         }
