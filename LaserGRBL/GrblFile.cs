@@ -16,8 +16,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using LaserGRBL.SvgConverter;
-using LaserGRBL.Obj3D;
-using SharpGL.SceneGraph;
 
 namespace LaserGRBL
 {
@@ -25,9 +23,8 @@ namespace LaserGRBL
 	{
 		public enum CartesianQuadrant { I, II, III, IV, Mix, Unknown }
 
-		public delegate void OnFileLoadedDlg(long elapsed, string filename);
-		public event OnFileLoadedDlg OnFileLoading;
-		public event OnFileLoadedDlg OnFileLoaded;
+		public event GrblCore.EventOnFileLoaded OnFileLoading;
+		public event GrblCore.EventOnFileLoaded OnFileLoaded;
 
 		private List<GrblCommand> list = new List<GrblCommand>();
 		private ProgramRange mRange = new ProgramRange();

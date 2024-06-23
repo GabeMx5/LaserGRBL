@@ -4,6 +4,7 @@
 // This program is distributed in the hope that it will be useful, but  WITHOUT ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GPLv3  General Public License for more details.
 // You should have received a copy of the GPLv3 General Public License  along with this program; if not, write to the Free Software  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,  USA. using System;
 
+using LaserGRBL.AddIn;
 using Sound;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace LaserGRBL
 	/// <summary>
 	/// Description of CommandThread.
 	/// </summary>
-	public class GrblCore
+	public class GrblCore: AddIn.CommonGrblCore
 	{
 		//public static PSHelper.PSFile MaterialDB = PSHelper.PSFile.Load();
 		public static PSHelper.MaterialDB MaterialDB = PSHelper.MaterialDB.Load();
@@ -88,185 +89,19 @@ namespace LaserGRBL
 			MachineAlarm = 5,
 		}
 
-		public enum MacStatus
-		{ Disconnected, Connecting, Idle, Run, Hold, Door, Home, Alarm, Check, Jog, Queue, Cooling, AutoHold, Tool } // "Tool" added in GrblHal
-
-		public enum JogDirection
-		{ None, Abort, Home, N, S, W, E, NW, NE, SW, SE, Zup, Zdown }
-
-		public enum StreamingMode
-		{ Buffered, Synchronous, RepeatOnError }
-
-		[Serializable]
-		public class GrblVersionInfo : IComparable, ICloneable
-		{
-			int mMajor;
-			int mMinor;
-			char mBuild;
-			bool mOrtur;
-			bool mGrblHal;
-
-			string mVendorInfo;
-			string mVendorVersion;
-
-			public GrblVersionInfo(int major, int minor, char build, string VendorInfo, string VendorVersion, bool IsHAL)
-			{
-				mMajor = major; mMinor = minor; mBuild = build;
-				mVendorInfo = VendorInfo;
-				mVendorVersion = VendorVersion;
-				mOrtur = VendorInfo != null && (VendorInfo.Contains("Ortur") || VendorInfo.Contains("Aufero"));
-				mGrblHal = IsHAL;
-			}
-
-			public GrblVersionInfo(int major, int minor, char build)
-			{ mMajor = major; mMinor = minor; mBuild = build; }
-
-			public GrblVersionInfo(int major, int minor)
-			{ mMajor = major; mMinor = minor; mBuild = (char)0; }
-
-			public static bool operator !=(GrblVersionInfo a, GrblVersionInfo b)
-			{ return !(a == b); }
-
-			public static bool operator ==(GrblVersionInfo a, GrblVersionInfo b)
-			{
-				if (Object.ReferenceEquals(a, null))
-					return Object.ReferenceEquals(b, null);
-				else
-					return a.Equals(b);
-			}
-
-			public static bool operator <(GrblVersionInfo a, GrblVersionInfo b)
-			{
-				if ((Object)a == null)
-					throw new ArgumentNullException("a");
-				return (a.CompareTo(b) < 0);
-			}
-
-			public static bool operator <=(GrblVersionInfo a, GrblVersionInfo b)
-			{
-				if ((Object)a == null)
-					throw new ArgumentNullException("a");
-				return (a.CompareTo(b) <= 0);
-			}
-
-			public static bool operator >(GrblVersionInfo a, GrblVersionInfo b)
-			{ return (b < a); }
-
-			public static bool operator >=(GrblVersionInfo a, GrblVersionInfo b)
-			{ return (b <= a); }
-
-			public override string ToString()
-			{
-				if (mBuild == (char)0)
-					return string.Format("{0}.{1}", mMajor, mMinor);
-				else
-					return string.Format("{0}.{1}{2}", mMajor, mMinor, mBuild);
-			}
-
-			public override bool Equals(object obj)
-			{
-				GrblVersionInfo v = obj as GrblVersionInfo;
-				return v != null && this.mMajor == v.mMajor && this.mMinor == v.mMinor && this.mBuild == v.mBuild && this.mOrtur == v.mOrtur && this.mGrblHal == v.mGrblHal;
-			}
-
-			public override int GetHashCode()
-			{
-				unchecked
-				{
-					int hash = 17;
-					// Maybe nullity checks, if these are objects not primitives!
-					hash = hash * 23 + mMajor.GetHashCode();
-					hash = hash * 23 + mMinor.GetHashCode();
-					hash = hash * 23 + mBuild.GetHashCode();
-					hash = hash * 23 + mOrtur.GetHashCode();
-					hash = hash * 23 + mGrblHal.GetHashCode();
-					return hash;
-				}
-			}
-
-			public int CompareTo(Object version)
-			{
-				if (version == null)
-					return 1;
-
-				GrblVersionInfo v = version as GrblVersionInfo;
-				if (v == null)
-					throw new ArgumentException("Argument must be GrblVersionInfo");
-
-				if (this.mMajor != v.mMajor)
-					if (this.mMajor > v.mMajor)
-						return 1;
-					else
-						return -1;
-
-				if (this.mMinor != v.mMinor)
-					if (this.mMinor > v.mMinor)
-						return 1;
-					else
-						return -1;
-
-				if (this.mBuild != v.mBuild)
-					if (this.mBuild > v.mBuild)
-						return 1;
-					else
-						return -1;
-
-				return 0;
-			}
-
-			public object Clone()
-			{ return this.MemberwiseClone(); }
-
-			public int Major => mMajor;
-			public int Minor => mMinor;
-			public bool IsOrtur => mOrtur;
-			public bool IsHAL => mGrblHal;
-			public bool IsLuckyOrturWiFi => IsOrtur && mVendorInfo == "Ortur Laser Master 3";
-			public string MachineName => mVendorInfo;
-
-			public string VendorName
-			{
-				get
-				{
-					if (mVendorInfo != null && mVendorInfo.ToLower().Contains("ortur"))
-						return "Ortur";
-					else if (mVendorInfo != null && mVendorInfo.ToLower().Contains("Vigotec"))
-						return "Vigotec";
-					else if (mBuild == '#')
-						return "Emulator";
-					else
-						return "Unknown";
-				}
-			}
-
-			public int OrturFWVersionNumber
-			{
-				get
-				{
-					try { return int.Parse(mVendorVersion); }
-					catch { return -1; }
-				}
-			}
-		}
 
 		public delegate void dlgIssueDetector(DetectedIssue issue);
-		public delegate void dlgOnMachineStatus();
 		public delegate void dlgOnOverrideChange();
 		public delegate void dlgOnLoopCountChange(decimal current);
-		public delegate void dlgJogStateChange(bool jog);
 
 		public event dlgIssueDetector IssueDetected;
-		public event dlgOnMachineStatus MachineStatusChanged;
-		public event GrblFile.OnFileLoadedDlg OnFileLoading;
-		public event GrblFile.OnFileLoadedDlg OnFileLoaded;
 		public event dlgOnOverrideChange OnOverrideChange;
 		public event dlgOnLoopCountChange OnLoopCountChange;
-		public event dlgJogStateChange JogStateChange;
-		public event Action<GrblCore> OnAutoSizeDrawing;
+
+        public event Action<GrblCore> OnAutoSizeDrawing;
 		public event Action<GrblCore> OnZoomInDrawing;
 		public event Action<GrblCore> OnZoomOutDrawing;
 
-		private System.Windows.Forms.Control syncro;
 		protected ComWrapper.IComWrapper com;
 		private GrblFile file;
 		private System.Collections.Generic.Queue<GrblCommand> mQueue; //vera coda di quelli da mandare
@@ -502,10 +337,10 @@ namespace LaserGRBL
 			EnqueueCommand(new GrblCommand("$X"));
 		}
 
-		public GrblVersionInfo GrblVersion //attenzione! può essere null
+		public override GrblVersionInfo GrblVersion //attenzione! può essere null
 		{
 			get { return Settings.GetObject<GrblVersionInfo>("Last GrblVersion known", null); }
-			set
+			protected set
 			{
 				if (GrblVersion != null)
 					Logger.LogMessage("VersionInfo", "Detected Grbl v{0}", value);
@@ -531,16 +366,6 @@ namespace LaserGRBL
 			}
 		}
 
-		void RiseJogStateChange(bool jog)
-		{
-			if (JogStateChange != null)
-			{
-				if (syncro.InvokeRequired)
-					syncro.BeginInvoke(new dlgJogStateChange(RiseJogStateChange), jog);
-				else
-					JogStateChange(jog);
-			}
-		}
 
 		void RiseIssueDetected(DetectedIssue issue)
 		{
@@ -550,17 +375,6 @@ namespace LaserGRBL
 					syncro.BeginInvoke(new dlgIssueDetector(RiseIssueDetected), issue);
 				else
 					IssueDetected(issue);
-			}
-		}
-
-		void RiseMachineStatusChanged()
-		{
-			if (MachineStatusChanged != null)
-			{
-				if (syncro.InvokeRequired)
-					syncro.BeginInvoke(new dlgOnMachineStatus(RiseMachineStatusChanged));
-				else
-					MachineStatusChanged();
 			}
 		}
 
@@ -575,21 +389,17 @@ namespace LaserGRBL
 			}
 		}
 
-		void RiseOnFileLoading(long elapsed, string filename)
+		protected override void RiseOnFileLoading(long elapsed, string filename)
 		{
 			mTP.Reset(true);
-
-			if (OnFileLoaded != null)
-				OnFileLoading?.Invoke(elapsed, filename);
+			base.RiseOnFileLoading(elapsed, filename);
 		}
 
-		void RiseOnFileLoaded(long elapsed, string filename)
+		protected override void RiseOnFileLoaded(long elapsed, string filename)
 		{
 			mTP.Reset(true);
-
-			if (OnFileLoaded != null)
-				OnFileLoaded?.Invoke(elapsed, filename);
-		}
+            base.RiseOnFileLoaded(elapsed, filename);
+        }
 
 		public GrblFile LoadedFile
 		{ get { return file; } }
@@ -603,7 +413,7 @@ namespace LaserGRBL
 		public static readonly List<string> ImageExtensions = new List<string>(new string[] { ".jpg", ".jpeg", ".bmp", ".png", ".gif" });
 		public static readonly List<string> GCodeExtensions = new List<string>(new string[] { ".nc", ".cnc", ".tap", ".gcode", ".ngc" });
 		public static readonly List<string> ProjectFileExtensions = new List<string>(new string[] { ".lps" });
-		public void OpenFile(Form parent, string filename = null, bool append = false)
+		public override void OpenFile(Form parent, string filename = null, bool append = false)
 		{
 			if (!CanLoadNewFile) return;
 
@@ -1358,7 +1168,7 @@ namespace LaserGRBL
 			}
 		}
 
-		public bool HasProgram
+		public override bool HasProgram
 		{ get { return file != null && file.Count > 0; } }
 
 		public void EnqueueCommand(GrblCommand cmd)
@@ -1450,7 +1260,7 @@ namespace LaserGRBL
 			LaserLifeHandler.SaveNow();
 		}
 
-		public bool IsConnected => mMachineStatus != MacStatus.Disconnected && mMachineStatus != MacStatus.Connecting;
+		public override bool IsConnected => mMachineStatus != MacStatus.Disconnected && mMachineStatus != MacStatus.Connecting;
 
 		#region Comandi immediati
 
@@ -1528,40 +1338,40 @@ namespace LaserGRBL
 
 		#region Public Property
 
-		public int ProgramTarget
+		public override int ProgramTarget
 		{ get { return mTP.Target; } }
 
-		public int ProgramSent
+		public override int ProgramSent
 		{ get { return mTP.Sent; } }
 
-		public int ProgramExecuted
+		public override int ProgramExecuted
 		{ get { return mTP.Executed; } }
 
-		public TimeSpan ProgramTime
+		public override TimeSpan ProgramTime
 		{ get { return mTP.TotalJobTime; } }
 
-		public TimeSpan ProgramGlobalTime
+		public override TimeSpan ProgramGlobalTime
 		{ get { return mTP.TotalGlobalJobTime; } }
 
-		public TimeSpan ProjectedTime
+		public override TimeSpan ProjectedTime
 		{ get { return mTP.ProjectedTarget; } }
 
-		public MacStatus MachineStatus
+		public override MacStatus MachineStatus
 		{ get { return mMachineStatus; } }
 
-		public bool InProgram
+		public override bool InProgram
 		{ get { return mTP.InProgram; } }
 
-		public GPoint MachinePosition
+		public override GPoint MachinePosition
 		{ get { return mMPos; } }
 
-		public GPoint WorkPosition //WCO = MPos - WPos
+		public override GPoint WorkPosition //WCO = MPos - WPos
 		{ get { return mMPos - mWCO; } }
 
-		public GPoint WorkingOffset
+		public override GPoint WorkingOffset
 		{ get { return mWCO; } }
 
-		public int Executed
+		public override int Executed
 		{ get { return mSent.Count; } }
 
 		public List<IGrblRow> SentCommand(int index, int count)
@@ -1576,37 +1386,7 @@ namespace LaserGRBL
 		}
 		#endregion
 
-		#region Grbl Version Support
-
-		public bool SupportRTO
-		{ get { return GrblVersion != null && GrblVersion >= new GrblVersionInfo(1, 1); } }
-
-		public virtual bool SupportTrueJogging
-		{ get { return GrblVersion != null && GrblVersion >= new GrblVersionInfo(1, 1); } }
-
-		public bool SupportCSV
-		{ get { return GrblVersion != null && GrblVersion >= new GrblVersionInfo(1, 1); } }
-
-		public bool SupportOverride
-		{ get { return GrblVersion != null && GrblVersion >= new GrblVersionInfo(1, 1); } }
-
-		public bool SupportLaserMode
-		{ get { return GrblVersion != null && GrblVersion >= new GrblVersionInfo(1, 1); } }
-
-		#endregion
-
-		public bool JogEnabled
-		{
-			get
-			{
-				if (SupportTrueJogging)
-					return IsConnected && (MachineStatus == GrblCore.MacStatus.Idle || MachineStatus == GrblCore.MacStatus.Jog);
-				else
-					return IsConnected && (MachineStatus == GrblCore.MacStatus.Idle || MachineStatus == GrblCore.MacStatus.Run) && !InProgram;
-			}
-		}
-
-		internal void EnqueueZJog(JogDirection dir, decimal step, bool fast)
+		public override void EnqueueZJog(JogDirection dir, decimal step, bool fast)
 		{
 			if (JogEnabled)
 			{
@@ -1619,7 +1399,7 @@ namespace LaserGRBL
 			}
 		}
 
-		public void BeginJog(PointF target, bool fast)
+		public override void BeginJog(PointF target, bool fast)
 		{
 			if (JogEnabled)
 			{
@@ -1645,7 +1425,7 @@ namespace LaserGRBL
 			return target;
 		}
 
-		public void BeginJog(JogDirection dir, bool fast) //da chiamare su ButtonDown
+		public override void BeginJog(JogDirection dir, bool fast) //da chiamare su ButtonDown
 		{
 			if (JogEnabled)
 			{
@@ -1761,7 +1541,7 @@ namespace LaserGRBL
 			return new GrblCommand(cmd);
 		}
 
-		public void EndJogV11() //da chiamare su ButtonUp
+		public override void EndJogV11() //da chiamare su ButtonUp
 		{
 			mPrenotedJogDirection = JogDirection.Abort;
 		}
@@ -1866,7 +1646,6 @@ namespace LaserGRBL
 				//	SetIssue(DetectedIssue.StopMoving);
 			}
 		}
-
 
 		private void OnConnectTimeout()
 		{
@@ -2659,7 +2438,7 @@ namespace LaserGRBL
 			{
 				Logger.LogMessage("CycleEnd", "Cycle Executed: {0} lines, {1} errors, {2}", file.Count, mTP.ErrorCount, Tools.Utils.TimeSpanToString(ProgramTime, Tools.Utils.TimePrecision.Second, Tools.Utils.TimePrecision.Second, ",", true));
 				mSentPtr.Add(new GrblMessage(string.Format("[{0} lines, {1} errors, {2}]", file.Count, mTP.ErrorCount, Tools.Utils.TimeSpanToString(ProgramTime, Tools.Utils.TimePrecision.Second, Tools.Utils.TimePrecision.Second, ",", true)), false));
-				OnProgramEnded?.Invoke();
+				RiseOnProgramEnded(false);
 				LoopCount--;
 				RunProgramFromStart(false, false, true);
 			}
@@ -2667,7 +2446,7 @@ namespace LaserGRBL
 			{
 				Logger.LogMessage("ProgramEnd", "Job Executed: {0} lines, {1} errors, {2}", file.Count, mTP.ErrorCount, Tools.Utils.TimeSpanToString(ProgramTime, Tools.Utils.TimePrecision.Second, Tools.Utils.TimePrecision.Second, ",", true));
 				mSentPtr.Add(new GrblMessage(string.Format("[{0} lines, {1} errors, {2}]", file.Count, mTP.ErrorCount, Tools.Utils.TimeSpanToString(ProgramTime, Tools.Utils.TimePrecision.Second, Tools.Utils.TimePrecision.Second, ",", true)), false));
-                OnProgramEnded?.Invoke();
+                RiseOnProgramEnded(true);
                 OnJobEnd();
 
 				SoundEvent.PlaySound(SoundEvent.EventId.Success);
@@ -2699,7 +2478,7 @@ namespace LaserGRBL
 			mRetryQueue = null;
 		}
 
-		public bool CanReOpenFile
+		public override bool CanReOpenFile
 		{
 			get
 			{
@@ -2708,64 +2487,64 @@ namespace LaserGRBL
 			}
 		}
 
-		public bool QueueEmpty { get { return mQueue.Count == 0; } }
+		public override bool QueueEmpty { get { return mQueue.Count == 0; } }
 
-		public bool CanLoadNewFile
+		public override bool CanLoadNewFile
 		{ get { return !InProgram; } }
 
-		public bool CanSendFile
+		public override bool CanSendFile
 		{ get { return IsConnected && HasProgram && IdleOrCheck && QueueEmpty && !mDoingSend; } }
 
-		public bool CanAbortProgram
+		public override bool CanAbortProgram
 		{ get { return IsConnected && HasProgram && (MachineStatus == MacStatus.Run || IsAnyHoldState(MachineStatus)) || !QueueEmpty; } }
 
-		public bool CanImportExport
+		public override bool CanImportExport
 		{ get { return IsConnected && MachineStatus == MacStatus.Idle; } }
 
-		public bool CanResetGrbl
+		public override bool CanResetGrbl
 		{ get { return IsConnected && MachineStatus != MacStatus.Disconnected; } }
 
-		public bool CanSendManualCommand
+		public override bool CanSendManualCommand
 		{ get { return IsConnected && MachineStatus != MacStatus.Disconnected && !InProgram; } }
 
-		public bool CanDoHoming
+		public override bool CanDoHoming
 		{ get { return IsConnected && (MachineStatus == MacStatus.Idle || MachineStatus == GrblCore.MacStatus.Alarm) && Configuration.HomingEnabled; } }
 
-		public bool CanDoZeroing
+		public override bool CanDoZeroing
 		{ get { return IsConnected && MachineStatus == MacStatus.Idle && WorkPosition != GPoint.Zero; } }
 
-		public bool CanUnlock
+		public override bool CanUnlock
 		{ get { return IsConnected && (MachineStatus == MacStatus.Idle || MachineStatus == GrblCore.MacStatus.Alarm); } }
 
-		public bool CanFeedHold
+		public override bool CanFeedHold
 		{ get { return IsConnected && MachineStatus == MacStatus.Run; } }
 
-		public bool CanResumeHold
+		public override bool CanResumeHold
 		{ get { return IsConnected && (MachineStatus == MacStatus.Door || IsAnyHoldState(MachineStatus)); } }
 
-		public bool CanReadWriteConfig
+		public override bool CanReadWriteConfig
 		{ get { return IsConnected && !InProgram && (MachineStatus == MacStatus.Idle || MachineStatus == MacStatus.Alarm); } }
 
-		public decimal LoopCount
+		public override decimal LoopCount
 		{ get { return mLoopCount; } set { mLoopCount = value; if (OnLoopCountChange != null) OnLoopCountChange(mLoopCount); } }
 
 		private ThreadingMode CurrentThreadingMode
 		{ get { return Settings.GetObject("Threading Mode", ThreadingMode.UltraFast); } }
 
-		public virtual StreamingMode CurrentStreamingMode
+		public override StreamingMode CurrentStreamingMode
 		{ get { return Settings.GetObject("Streaming Mode", StreamingMode.Buffered); } }
 
 		private bool IdleOrCheck
 		{ get { return MachineStatus == MacStatus.Idle || MachineStatus == MacStatus.Check; } }
 
-		public bool AutoCooling
+		public override bool AutoCooling
 		{ get { return Settings.GetObject("AutoCooling", false) && SupportAutoCooling; } }
-		public bool SupportAutoCooling { get => GrblVersion != null && GrblVersion >= new GrblVersionInfo(1, 1) && Configuration != null && Configuration.LaserMode; }
+		public override bool SupportAutoCooling { get => GrblVersion != null && GrblVersion >= new GrblVersionInfo(1, 1) && Configuration != null && Configuration.LaserMode; }
 
-		public TimeSpan AutoCoolingOn
+		public override TimeSpan AutoCoolingOn
 		{ get { return Settings.GetObject("AutoCooling TOn", TimeSpan.FromMinutes(10)); } }
 
-		public TimeSpan AutoCoolingOff
+		public override TimeSpan AutoCoolingOff
 		{ get { return Settings.GetObject("AutoCooling TOff", TimeSpan.FromMinutes(1)); } }
 
 		private void ManageCoolingCycles()
@@ -2901,19 +2680,16 @@ namespace LaserGRBL
 		internal void HelpOnLine()
 		{ Tools.Utils.OpenLink(@"https://lasergrbl.com/usage/"); }
 
-		internal void GrblHoming()
+		public override void GrblHoming()
 		{ if (CanDoHoming) EnqueueCommand(new GrblCommand("$H")); }
 
-		internal void GrblUnlock()
+		public override void GrblUnlock()
 		{ if (CanUnlock) EnqueueCommand(new GrblCommand("$X")); }
 
-		internal void SetNewZero()
+		public override void SetNewZero()
 		{ if (CanDoZeroing) EnqueueCommand(new GrblCommand("G92 X0 Y0 Z0")); }
 
-		public int JogSpeed { get; set; }
-		public decimal JogStep { get; set; }
-
-		public bool ContinuosJogEnabled { get { return Settings.GetObject("Enable Continuous Jog", false); } }
+		public override bool ContinuosJogEnabled { get { return Settings.GetObject("Enable Continuous Jog", false); } }
 
 		public bool SuspendHK { get; set; }
 
@@ -2934,7 +2710,7 @@ namespace LaserGRBL
 		//}
 
 		static System.Text.RegularExpressions.Regex bracketsRegEx = new System.Text.RegularExpressions.Regex(@"\[(?:[^]]+)\]");
-		internal void ExecuteCustombutton(string buttoncode)
+		public override void ExecuteCustombutton(string buttoncode)
 		{
 			buttoncode = buttoncode.Trim();
 			string[] arr = buttoncode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
@@ -3055,8 +2831,8 @@ namespace LaserGRBL
 		{ return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.000}", value); }
 
 
-		public float CurrentF { get { return mCurF; } }
-		public float CurrentS { get { return mCurS; } }
+		public override float CurrentF { get { return mCurF; } }
+		public override float CurrentS { get { return mCurS; } }
 
 		private static IEnumerable<GrblCommand> StringToGCode(string input)
 		{
@@ -3092,7 +2868,6 @@ namespace LaserGRBL
 		public bool IsOrturBoard { get => GrblVersion != null && GrblVersion.IsOrtur; }
 		public int FailedConnectionCount => mFailedConnection;
 
-		public event Action OnProgramEnded;
     }
 
 	public class TimeProjection
@@ -3904,53 +3679,6 @@ namespace LaserGRBL
 		}
 	}
 
-	public struct GPoint
-	{
-		public float X, Y, Z;
-
-		public GPoint(float x, float y, float z)
-		{
-			X = x;
-			Y = y;
-			Z = z;
-		}
-
-		public static GPoint Zero { get { return new GPoint(); } }
-
-		public static bool operator ==(GPoint a, GPoint b)
-		{ return a.X == b.X && a.Y == b.Y && a.Z == b.Z; }
-
-		public static bool operator !=(GPoint a, GPoint b)
-		{ return !(a == b); }
-
-		public static GPoint operator -(GPoint a, GPoint b)
-		{ return new GPoint(a.X - b.X, a.Y - b.Y, a.Z - b.Z); }
-
-		public static GPoint operator +(GPoint a, GPoint b)
-		{ return new GPoint(a.X + b.X, a.Y + b.Y, a.Z + b.Z); }
-
-		public override bool Equals(object obj)
-		{
-			return obj is GPoint && ((GPoint)obj) == this;
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked // Overflow is fine, just wrap
-			{
-				int hash = 17;
-				hash = hash * 23 + X.GetHashCode();
-				hash = hash * 23 + Y.GetHashCode();
-				hash = hash * 23 + Z.GetHashCode();
-				return hash;
-			}
-		}
-
-		internal PointF ToPointF()
-		{
-			return new PointF(X, Y);
-		}
-	}
 
 
 	public static class LaserLifeHandler
@@ -4145,7 +3873,7 @@ namespace LaserGRBL
 						long delta = now - (mLastPowerHiResTimeNano ?? now);
 						if (delta > 0 && delta < 600000000000L) //do not add delta if bigger then 600s (or negative) - just a safety test
 						{
-							double perc = status == MacStatus.Run ? 1 : 0; //potenza da applicare a questo delta
+							double perc = status == GrblCore.MacStatus.Run ? 1 : 0; //potenza da applicare a questo delta
 							double normal = delta * perc;
 							mCurrentLLC?.AddRunTime(TimeSpan.FromMilliseconds(normal / 1000 / 1000));
 						}

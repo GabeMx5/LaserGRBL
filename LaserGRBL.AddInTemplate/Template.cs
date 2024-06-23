@@ -1,4 +1,5 @@
-﻿using SharpDX.XInput;
+﻿using LaserGRBL.AddIn;
+using SharpDX.XInput;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,7 +15,7 @@ namespace LaserGRBL.AddInTemplate
         public Config Config { get; private set; } = new Config();
         public Data Data { get; private set; } = new Data();
 
-        public Template(ToolStripMenuItem menuItem): base(menuItem)
+        public Template(CommonGrblCore core, ToolStripMenuItem menuItem): base(core, menuItem)
         {
             ToolStripMenuItem privateItem = new ToolStripMenuItem
             {
@@ -41,9 +42,11 @@ namespace LaserGRBL.AddInTemplate
                         Data.Power = Math.Round(state.Gamepad.RightTrigger / 256.0, 1);
                         if (Data.IsChanged)
                         {
+                            /*
                             SendImmediate(0x85, true);
                             if (Data.IsPowerChanged) EnqueueCommand($"S{ScaleValue(Data.Power, 1000)}");
                             if (!Data.IsZeroPosition) EnqueueCommand($"$J=G91X{Data.X * 5000}Y{Data.Y * 5000}F{ScaleValue(distance, 5000)}");
+                            */
                         }
                     }
                     System.Threading.Thread.Sleep(200);
@@ -87,8 +90,6 @@ namespace LaserGRBL.AddInTemplate
             }
         }
 
-        public override void OnFileLoaded(long elapsed, string filename)
-        {
-        }
     }
+
 }

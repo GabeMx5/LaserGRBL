@@ -59,9 +59,7 @@ namespace LaserGRBL.AddIn
                                 ToolStripMenuItem addInMenuItem = new ToolStripMenuItem();
                                 addInMenuItemRoot.DropDownItems.Add(addInMenuItem);
                                 // create the AddIn instance
-                                AddIn addIn = (AddIn)Activator.CreateInstance(type, new object[] { addInMenuItem });
-                                addIn.OnEnqueueCommand += (command) => core.EnqueueCommand(new GrblCommand(command));
-                                addIn.OnSendImmediate += (b, mute) => core.SendImmediate(b, mute);
+                                AddIn addIn = (AddIn)Activator.CreateInstance(type, new object[] { core, addInMenuItem });
                                 // add the AddIn to the list
                                 mAddIns.Add(addIn);
                                 showAddInMenu = true;
@@ -89,10 +87,6 @@ namespace LaserGRBL.AddIn
                 }
             }
         }
-
-        internal static void InvokeOnFileLoading(long elapsed, string filename) => ForEveryAddIn((addIn) => addIn.OnFileLoading(elapsed, filename));
-
-        internal static void InvokeOnFileLoaded(long elapsed, string filename) => ForEveryAddIn((addIn) => addIn.OnFileLoaded(elapsed, filename));
 
     }
 

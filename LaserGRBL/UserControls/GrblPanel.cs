@@ -8,7 +8,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using LaserGRBL;
+using LaserGRBL.AddIn;
 using SharpGL;
 
 namespace LaserGRBL.UserControls

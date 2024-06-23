@@ -79,7 +79,7 @@ namespace LaserGRBL
 		{
 			if (InvokeRequired)
 			{
-				Invoke(new GrblFile.OnFileLoadedDlg(OnFileLoaded), elapsed, filename);
+				Invoke(new GrblCore.EventOnFileLoaded(OnFileLoaded), elapsed, filename);
 			}
 			else
 			{

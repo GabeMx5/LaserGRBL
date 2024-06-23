@@ -10,7 +10,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Tools;
 using static LaserGRBL.ProgramRange;
-using static System.Net.Mime.MediaTypeNames;
+using LaserGRBL.AddIn;
 
 namespace LaserGRBL.UserControls
 {
@@ -862,7 +862,7 @@ namespace LaserGRBL.UserControls
 			mMessage = Strings.Loading;
         }
 
-        private void OnProgramEnded()
+        private void OnProgramEnded(bool completed)
 		{
 			foreach (var command in Core.LoadedFile.Commands)
 			{
