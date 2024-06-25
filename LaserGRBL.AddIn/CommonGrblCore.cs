@@ -11,7 +11,7 @@ namespace LaserGRBL.AddIn
         { Disconnected, Connecting, Idle, Run, Hold, Door, Home, Alarm, Check, Jog, Queue, Cooling, AutoHold, Tool } // "Tool" added in GrblHal
 
         public enum JogDirection
-        { None, Abort, Home, N, S, W, E, NW, NE, SW, SE, Zup, Zdown }
+        { Abort, Home, N, S, W, E, NW, NE, SW, SE, Zup, Zdown, Position }
 
         public enum StreamingMode
         { Buffered, Synchronous, RepeatOnError }
@@ -266,15 +266,16 @@ namespace LaserGRBL.AddIn
                     return IsConnected && (MachineStatus == MacStatus.Idle || MachineStatus == MacStatus.Run) && !InProgram;
             }
         }
+        
+        public abstract void JogToPosition(PointF target, bool fast);
 
-        public abstract void EnqueueZJog(JogDirection dir, decimal step, bool fast);
-        public abstract void EnqueueZJog(JogDirection dir, decimal step, double speed);
+        public abstract void JogToDirection(JogDirection dir, bool fast);
 
-        public abstract void BeginJog(PointF target, bool fast);
-        public abstract void BeginJog(PointF target, double speed);
+        public abstract void JogToDirection(JogDirection dir, bool fast, decimal step);
 
-        public abstract void BeginJog(JogDirection dir, bool fast);
-        public abstract void BeginJog(JogDirection dir, double speed);
+        public abstract void JogToDirection(JogDirection dir, float speed, decimal step);
+
+        public abstract void JogAbort();
 
         public abstract bool CanReOpenFile { get; }
 
