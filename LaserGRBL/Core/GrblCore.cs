@@ -1385,7 +1385,7 @@ namespace LaserGRBL
 		#endregion
 
 		public override void JogToPosition(PointF target, bool fast) => JogToPosition(target, fast ? 100000 : JogSpeed); //da chiamare su doppio click
-		public void JogToPosition(PointF target, float speed)
+		public override void JogToPosition(PointF target, float speed)
 		{
 			target = LimitToBound(target); //if soft limit enabled -> crop to machine area
 

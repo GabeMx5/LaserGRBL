@@ -269,6 +269,8 @@ namespace LaserGRBL.AddIn
         
         public abstract void JogToPosition(PointF target, bool fast);
 
+        public abstract void JogToPosition(PointF target, float speed);
+
         public abstract void JogToDirection(JogDirection dir, bool fast);
 
         public abstract void JogToDirection(JogDirection dir, bool fast, decimal step);
