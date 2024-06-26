@@ -1352,7 +1352,6 @@ namespace LaserGRBL
         {
             if (PreviewForm.GrblPanel is GrblPanel3D)
             {
-                GrblPanel3D panel3D = PreviewForm.GrblPanel as GrblPanel3D;
 				Core.ShowLaserOffMovements.Value = showLaserOffMovementsToolStripMenuItem.Checked;
             }
         }
@@ -1361,7 +1360,6 @@ namespace LaserGRBL
         {
             if (PreviewForm.GrblPanel is GrblPanel3D)
             {
-                GrblPanel3D panel3D = PreviewForm.GrblPanel as GrblPanel3D;
                 Core.ShowExecutedCommands.Value = showExecutedCommandsToolStripMenuItem.Checked;
             }
         }
@@ -1370,7 +1368,6 @@ namespace LaserGRBL
         {
             if (PreviewForm.GrblPanel is GrblPanel3D)
             {
-                GrblPanel3D panel3D = PreviewForm.GrblPanel as GrblPanel3D;
                 Core.PreviewLineSize.Value = Convert.ToInt32((sender as ToolStripMenuItem).Tag);
 				CheckLineWidthItem();
             }
