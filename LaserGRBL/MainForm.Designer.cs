@@ -137,6 +137,7 @@
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.configurationWizardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.MnOrtur = new System.Windows.Forms.ToolStripMenuItem();
+			this.addInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.orturSupportGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.orturSupportAndFeedbackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.orturWebsiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -339,6 +340,7 @@
             this.linguaToolStripMenuItem,
             this.toolsToolStripMenuItem,
             this.MnOrtur,
+			this.addInToolStripMenuItem,
             this.questionMarkToolStripMenuItem});
 			resources.ApplyResources(this.MMn, "MMn");
 			this.MMn.Name = "MMn";
@@ -960,6 +962,11 @@
 			this.MnOrtur.Name = "MnOrtur";
 			resources.ApplyResources(this.MnOrtur, "MnOrtur");
 			// 
+			// addInToolStripMenuItem
+			// 
+			this.addInToolStripMenuItem.Name = "addInToolStripMenuItem";
+			resources.ApplyResources(this.addInToolStripMenuItem, "addInToolStripMenuItem");
+			// 
 			// orturSupportGroupToolStripMenuItem
 			// 
 			this.orturSupportGroupToolStripMenuItem.Name = "orturSupportGroupToolStripMenuItem";
@@ -1291,6 +1298,7 @@
 		private System.Windows.Forms.ToolStripMenuItem MnMaterialDB;
 		private System.Windows.Forms.ToolStripMenuItem polishToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem MnOrtur;
+		private System.Windows.Forms.ToolStripMenuItem addInToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem orturSupportGroupToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem orturWebsiteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem facebookCommunityToolStripMenuItem;

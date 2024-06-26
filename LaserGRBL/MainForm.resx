@@ -9782,6 +9782,12 @@
   <data name="&gt;&gt;MnOrtur.Name" xml:space="preserve">
     <value>MnOrtur</value>
   </data>
+  <data name="addInToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="addInToolStripMenuItem.Text" xml:space="preserve">
+    <value>Add in</value>
+  </data>
   <data name="&gt;&gt;MnOrtur.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
