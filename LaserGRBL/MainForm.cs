@@ -89,7 +89,11 @@ namespace LaserGRBL
 			showLaserOffMovementsToolStripMenuItem.Checked = Core.ShowLaserOffMovements.Value;
 			showExecutedCommandsToolStripMenuItem.Checked = Core.ShowExecutedCommands.Value;
 			showDiagnosticDataToolStripMenuItem.Checked = Core.ShowPerformanceDiagnostic.Value;
-			CheckLineWidthItem();
+            showBoundingBoxToolStripMenuItem.Checked = Core.ShowBoundingBox.Value;
+            drawingAreaToolStripMenuItem.Checked = Core.AutoSizeOnDrawing.Value;
+            machineAreaToolStripMenuItem.Checked = !Core.AutoSizeOnDrawing.Value;
+
+            CheckLineWidthItem();
 
 			MnGrblConfig.Visible = Core.UIShowGrblConfig;
 			MnUnlock.Visible = Core.UIShowUnlockButtons;
@@ -305,6 +309,7 @@ namespace LaserGRBL
 			IconsMgr.PrepareMenuItem(donateToolStripMenuItem, "mdi-gift");
 			IconsMgr.PrepareMenuItem(licenseToolStripMenuItem, "mdi-license");
 			IconsMgr.PrepareMenuItem(MnCheckNow, "mdi-cloud-check-variant-outline");
+			IconsMgr.PrepareMenuItem(autosizeToolStripMenuItem, "mdi-resize");
 			if (!IconsMgr.LegacyIcons)
 			{
 				IconsMgr.PrepareMenuItem(MnGrbl, "mdi-hammer-wrench");
@@ -1389,15 +1394,44 @@ namespace LaserGRBL
 		{
 			if (PreviewForm.GrblPanel is GrblPanel3D)
 			{
-				GrblPanel3D panel3D = PreviewForm.GrblPanel as GrblPanel3D;
 				Core.ShowPerformanceDiagnostic.Value = showDiagnosticDataToolStripMenuItem.Checked;
 			}
 		}
 
-	}
+        private void showBoundingBoxToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (PreviewForm.GrblPanel is GrblPanel3D)
+            {
+                Core.ShowBoundingBox.Value = showBoundingBoxToolStripMenuItem.Checked;
+                (PreviewForm.GrblPanel as GrblPanel3D).RR.Set();
+            }
+        }
+
+        private void drawingAreaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (PreviewForm.GrblPanel is GrblPanel3D)
+            {
+                Core.AutoSizeOnDrawing.Value = drawingAreaToolStripMenuItem.Checked;
+                machineAreaToolStripMenuItem.Checked = !Core.AutoSizeOnDrawing.Value;
+                (PreviewForm.GrblPanel as GrblPanel3D).AutoSizeDrawing();
+            }
+        }
+
+        private void machineAreaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (PreviewForm.GrblPanel is GrblPanel3D)
+            {
+                Core.AutoSizeOnDrawing.Value = !machineAreaToolStripMenuItem.Checked;
+                drawingAreaToolStripMenuItem.Checked = Core.AutoSizeOnDrawing.Value;
+                (PreviewForm.GrblPanel as GrblPanel3D).AutoSizeDrawing();
+            }
+        }
+    }
 
 
-	public class MMnRenderer : ToolStripProfessionalRenderer
+    public class MMnRenderer : ToolStripProfessionalRenderer
 	{
 		public MMnRenderer() : base(new CustomMenuColor()) { }
 
