@@ -309,7 +309,7 @@ namespace LaserGRBL
 			IconsMgr.PrepareMenuItem(donateToolStripMenuItem, "mdi-gift");
 			IconsMgr.PrepareMenuItem(licenseToolStripMenuItem, "mdi-license");
 			IconsMgr.PrepareMenuItem(MnCheckNow, "mdi-cloud-check-variant-outline");
-			IconsMgr.PrepareMenuItem(autosizeToolStripMenuItem, "mdi-resize");
+			IconsMgr.PrepareMenuItem(autosizeModeToolStripMenuItem, "mdi-resize");
 			if (!IconsMgr.LegacyIcons)
 			{
 				IconsMgr.PrepareMenuItem(MnGrbl, "mdi-hammer-wrench");
@@ -1321,7 +1321,7 @@ namespace LaserGRBL
 			Generator.ShakeTest.CreateAndShowDialog(this, Core);
 		}
 
-        private void autoSizeToolStripMenuItem_Click_1(object sender, EventArgs e)
+        private void autoSizeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (PreviewForm.GrblPanel is GrblPanel3D)
             {
