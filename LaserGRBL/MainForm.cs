@@ -90,8 +90,9 @@ namespace LaserGRBL
 			showExecutedCommandsToolStripMenuItem.Checked = Core.ShowExecutedCommands.Value;
 			showDiagnosticDataToolStripMenuItem.Checked = Core.ShowPerformanceDiagnostic.Value;
             showBoundingBoxToolStripMenuItem.Checked = Core.ShowBoundingBox.Value;
+			crossCursorToolStripMenuItem.Checked = Core.CrossCursor.Value;
             drawingAreaToolStripMenuItem.Checked = Core.AutoSizeOnDrawing.Value;
-            machineAreaToolStripMenuItem.Checked = !Core.AutoSizeOnDrawing.Value;
+            movingAreaToolStripMenuItem.Checked = !Core.AutoSizeOnDrawing.Value;
 
             CheckLineWidthItem();
 
@@ -1404,13 +1405,22 @@ namespace LaserGRBL
             }
         }
 
+        private void crossCursorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (PreviewForm.GrblPanel is GrblPanel3D)
+            {
+                Core.CrossCursor.Value = crossCursorToolStripMenuItem.Checked;
+                (PreviewForm.GrblPanel as GrblPanel3D).RR.Set();
+            }
+        }
+
         private void drawingAreaToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
             if (PreviewForm.GrblPanel is GrblPanel3D)
             {
                 Core.AutoSizeOnDrawing.Value = drawingAreaToolStripMenuItem.Checked;
-                machineAreaToolStripMenuItem.Checked = !Core.AutoSizeOnDrawing.Value;
+                movingAreaToolStripMenuItem.Checked = !Core.AutoSizeOnDrawing.Value;
                 (PreviewForm.GrblPanel as GrblPanel3D).AutoSizeDrawing();
             }
         }
@@ -1420,7 +1430,7 @@ namespace LaserGRBL
 
             if (PreviewForm.GrblPanel is GrblPanel3D)
             {
-                Core.AutoSizeOnDrawing.Value = !machineAreaToolStripMenuItem.Checked;
+                Core.AutoSizeOnDrawing.Value = !movingAreaToolStripMenuItem.Checked;
                 drawingAreaToolStripMenuItem.Checked = Core.AutoSizeOnDrawing.Value;
                 (PreviewForm.GrblPanel as GrblPanel3D).AutoSizeDrawing();
             }
