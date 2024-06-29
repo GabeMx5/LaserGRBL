@@ -20,7 +20,7 @@ namespace LaserGRBL.AddInTemplate
 
         private void tmrRefresh_Tick(object sender, EventArgs e)
         {
-            lblData.Text = $"X: {mAddIn.Data.X}\r\nY: {mAddIn.Data.Y}\r\nPower: {mAddIn.Data.Power}";
+            lblData.Text = $"X: {mAddIn.Data.X.Value}\r\nY: {mAddIn.Data.Y.Value}\r\nPower: {mAddIn.Data.Power.Value}";
         }
     }
 }
