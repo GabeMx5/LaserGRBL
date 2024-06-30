@@ -29,6 +29,8 @@ namespace LaserGRBL.AddIn
 
         protected Control syncro;
 
+        public abstract CommonImageButton AddButton(string icon, string tooltip);
+
         protected virtual void RiseMachineStatusChanged()
         {
             if (MachineStatusChanged != null)

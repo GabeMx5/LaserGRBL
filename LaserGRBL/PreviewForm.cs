@@ -4,6 +4,7 @@
 // This program is distributed in the hope that it will be useful, but  WITHOUT ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GPLv3  General Public License for more details.
 // You should have received a copy of the GPLv3 General Public License  along with this program; if not, write to the Free Software  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,  USA. using System;
 
+using LaserGRBL.AddIn;
 using LaserGRBL.Icons;
 using LaserGRBL.UserControls;
 using System;
@@ -92,9 +93,28 @@ namespace LaserGRBL
 
             RefreshCustomButtons();
 			TimerUpdate();
-		}
 
-		public void TimerUpdate()
+            //AddButton("mdi-account-circle");
+            //AddButton("mdi-bluetooth");
+            //AddButton("mdi-gamepad");
+        }
+
+        public CommonImageButton AddButton(string icon, string tooltip)
+        {
+            ImageButton button = new ImageButton();
+            IconsMgr.PrepareButton(button, icon, new Size(49, 49));
+            button.RoundedBorders = true;
+            button.Enabled = false;
+            button.Margin = new Padding(2);
+            ToolTip tt = new ToolTip();
+            tt.SetToolTip(button, tooltip);
+            AddInIcons.Height = 53;
+            AddInIcons.Controls.Add(button);
+            AddInIcons.Width = AddInIcons.Controls.Count * 54;
+            return button;
+        }
+
+        public void TimerUpdate()
 		{
             GrblPanel.TimerUpdate();
 			SuspendLayout();
@@ -105,9 +125,9 @@ namespace LaserGRBL
 			BtnStop.Enabled = mCore.CanFeedHold;
 			BtnResume.Enabled = mCore.CanResumeHold;
 			BtnZeroing.Enabled = mCore.CanDoZeroing;
-			foreach (CustomButtonIB ib in CustomButtonArea.Controls)
+			foreach (Control ctrl in CustomButtonArea.Controls)
 			{
-                ib.RefreshEnabled();
+                if (ctrl is CustomButtonIB ib) ib.RefreshEnabled();
             }
 				
 

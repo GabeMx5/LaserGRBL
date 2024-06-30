@@ -18,6 +18,9 @@ namespace LaserGRBL.AddInTemplate
 
         public Template(CommonGrblCore core, ToolStripMenuItem menuItem): base(core, menuItem)
         {
+            CommonImageButton button = core.AddButton("mdi-gamepad", "Open gamepad form");
+            button.Enabled = true;
+            button.Click += PrivateItem_Click;
             ToolStripMenuItem privateItem = new ToolStripMenuItem
             {
                 Text = "Config"

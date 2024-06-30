@@ -311,6 +311,7 @@ namespace LaserGRBL
 
 		private string mDetectedIP = null;
 		private bool mDoingSend = false;
+		private readonly PreviewForm mPreviewForm;
 
         public RetainedSetting<bool> ShowLaserOffMovements { get; } = new RetainedSetting<bool>("ShowLaserOffMovements", true);
         public RetainedSetting<bool> ShowExecutedCommands { get; } = new RetainedSetting<bool>("ShowExecutedCommands", true);
@@ -322,7 +323,9 @@ namespace LaserGRBL
 
         public GrblCore(System.Windows.Forms.Control syncroObject, PreviewForm cbform, JogForm jogform)
 		{
-			if (Type != Firmware.Grbl) Logger.LogMessage("Program", "Load {0} core", Type);
+            mPreviewForm = cbform;
+
+            if (Type != Firmware.Grbl) Logger.LogMessage("Program", "Load {0} core", Type);
 
 			SetStatus(MacStatus.Disconnected);
 			syncro = syncroObject;
@@ -370,6 +373,8 @@ namespace LaserGRBL
 			if (GrblVersion != null)
 				CSVD.LoadAppropriateCSV(GrblVersion); //load setting for last known version
 		}
+
+		public override CommonImageButton AddButton(string icon, string tooltip) => mPreviewForm.AddButton(icon, tooltip); 
 
         #region Grbl Version Support
 

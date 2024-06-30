@@ -44,6 +44,9 @@
   <ItemGroup>
     <Compile Include="AddIn.cs" />
     <Compile Include="CommonGrblCore.cs" />
+    <Compile Include="CommonImageButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

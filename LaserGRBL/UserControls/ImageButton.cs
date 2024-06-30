@@ -4,6 +4,7 @@
 // This program is distributed in the hope that it will be useful, but  WITHOUT ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GPLv3  General Public License for more details.
 // You should have received a copy of the GPLv3 General Public License  along with this program; if not, write to the Free Software  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,  USA. using System;
 
+using LaserGRBL.AddIn;
 using LaserGRBL.Icons;
 using System;
 using System.Diagnostics;
@@ -18,7 +19,7 @@ namespace LaserGRBL.UserControls
 {
 
     [System.ComponentModel.DefaultEvent("Click")]
-    public partial class ImageButton : System.Windows.Forms.UserControl
+    public partial class ImageButton : CommonImageButton
     {
         private const float CAPTION_FONTSIZE = 7f;
         private const int CAPTION_HEIGHT = 12;
@@ -69,7 +70,7 @@ namespace LaserGRBL.UserControls
             }
         }
 
-        public string Caption { get; set; }
+        public override string Caption { get; set; }
 
         private bool HasCaption
         {
