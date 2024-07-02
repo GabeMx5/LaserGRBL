@@ -41,11 +41,11 @@ namespace LaserGRBL.AddInTemplate
                         Data.Y.Value = MapValue(state.Gamepad.LeftThumbY);
                         if (buttonA.Value && !buttonA.PreviousValue)
                         {
-                            Core.ExecuteCustombutton("M3 S[$30*10/100]\r\nG1 F1000");
+                            Core.ExecuteCustomCode("M3 S[$30*10/100]\r\nG1 F1000");
                         }
                         if (!buttonA.Value && buttonA.PreviousValue)
                         {
-                            Core.ExecuteCustombutton("M5 S0\r\nG0");
+                            Core.ExecuteCustomCode("M5 S0\r\nG0");
                         }
                         double distance = Quantize(Math.Sqrt(Math.Pow(Data.X.Value, 2) + Math.Pow(Data.Y.Value, 2)));
                         if (distance > 1) distance = 1;

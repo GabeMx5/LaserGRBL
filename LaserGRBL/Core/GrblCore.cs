@@ -1274,19 +1274,19 @@ namespace LaserGRBL
 		private void OnJobCycle()
 		{
 			Logger.LogMessage("EnqueueProgram", "Push Passes");
-			ExecuteCustombutton(Settings.GetObject("GCode.CustomPasses", GrblCore.GCODE_STD_PASSES));
+			ExecuteCustomCode(Settings.GetObject("GCode.CustomPasses", GrblCore.GCODE_STD_PASSES));
 		}
 
 		protected virtual void OnJobBegin()
 		{
 			Logger.LogMessage("EnqueueProgram", "Push Header");
-			ExecuteCustombutton(Settings.GetObject("GCode.CustomHeader", GrblCore.GCODE_STD_HEADER));
+			ExecuteCustomCode(Settings.GetObject("GCode.CustomHeader", GrblCore.GCODE_STD_HEADER));
 		}
 
 		protected virtual void OnJobEnd()
 		{
 			Logger.LogMessage("EnqueueProgram", "Push Footer");
-			ExecuteCustombutton(Settings.GetObject("GCode.CustomFooter", GrblCore.GCODE_STD_FOOTER));
+			ExecuteCustomCode(Settings.GetObject("GCode.CustomFooter", GrblCore.GCODE_STD_FOOTER));
 		}
 
 		private void ContinueProgramFromKnown(int position, bool homing, bool setwco)
@@ -2757,7 +2757,7 @@ namespace LaserGRBL
 		public override bool QueueEmpty { get { return mQueue.Count == 0; } }
 
 		public override bool CanLoadNewFile
-		{ get { return !InProgram; } }
+		{ get { return !InProgram && !file.CheckInUse(false); } }
 
 		public override bool CanSendFile
 		{ get { return IsConnected && HasProgram && IdleOrCheck && QueueEmpty && !mDoingSend; } }
@@ -2977,7 +2977,7 @@ namespace LaserGRBL
 		//}
 
 		static System.Text.RegularExpressions.Regex bracketsRegEx = new System.Text.RegularExpressions.Regex(@"\[(?:[^]]+)\]");
-		public override void ExecuteCustombutton(string buttoncode)
+		public override void ExecuteCustomCode(string buttoncode)
 		{
 			buttoncode = buttoncode.Trim();
 			string[] arr = buttoncode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
@@ -3630,6 +3630,13 @@ namespace LaserGRBL
 				return true;
 			else
 				return false;
+		}
+
+		bool CompareValues(string a, string b)
+		{
+			if (Equals(a, b))
+				return true;
+			return false;
 		}
 
 		private bool ContainsKey(int key)

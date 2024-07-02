@@ -167,7 +167,7 @@ namespace LaserGRBL.AddIn
 
         public abstract bool ContinuosJogEnabled { get; }
 
-        public abstract void ExecuteCustombutton(string buttoncode);
+        public abstract void ExecuteCustomCode(string buttoncode);
 
         public abstract float CurrentF { get; }
 

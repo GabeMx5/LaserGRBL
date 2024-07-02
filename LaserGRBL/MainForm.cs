@@ -580,7 +580,6 @@ namespace LaserGRBL
 			else
 				TTLEstimated.Text = Strings.MainFormEstimatedTime;
 
-			MnFileOpen.Enabled = Core.CanLoadNewFile;
 			MnSaveProject.Enabled = MnAdvancedSave.Enabled = MnSaveProgram.Enabled = Core.HasProgram;
 			MnFileSend.Enabled = Core.CanSendFile;
 			MnStartFromPosition.Enabled = Core.CanSendFile;
@@ -944,6 +943,8 @@ namespace LaserGRBL
 
 		private void fileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
 		{
+			MnFileOpen.Enabled = Core.CanLoadNewFile;
+			MnFileAppend.Enabled = Core.CanLoadNewFile;
 			MnReOpenFile.Enabled = Core.CanReOpenFile;
 		}
 
