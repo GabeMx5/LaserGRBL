@@ -109,6 +109,10 @@ namespace LaserGRBL.AddIn
 
         public abstract void JogToDirection(JogDirection dir, float speed, decimal step);
 
+        public abstract void ContinuousJogToPosition(PointF target, float speed);
+
+        public abstract void ContinuousJogToDirection(JogDirection dir, float speed);
+
         public abstract void JogAbort();
 
         public abstract bool CanReOpenFile { get; }

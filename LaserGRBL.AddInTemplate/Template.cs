@@ -56,7 +56,7 @@ namespace LaserGRBL.AddInTemplate
                             if (!Data.IsZeroPosition)
                             {
                                 PointF target = new PointF((float)Data.X.Value * 5000, (float)Data.Y.Value * 5000);
-                                Core.JogToPosition(target, (float)ScaleValue(distance, 5000));
+                                Core.ContinuousJogToPosition(target, (float)ScaleValue(distance, 5000));
                             }
                             else
                             {
