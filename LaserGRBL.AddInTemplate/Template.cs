@@ -1,6 +1,7 @@
 ﻿using LaserGRBL.AddIn;
 using SharpDX.XInput;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -30,30 +31,38 @@ namespace LaserGRBL.AddInTemplate
             mController = new Controller(UserIndex.One);
             Task.Factory.StartNew(() =>
             {
-                ChangingVar<bool> buttonA = new ChangingVar<bool>();
+                List<ButtonVar> buttons = new List<ButtonVar>() {
+                    new ButtonVar(GamepadButtonFlags.A, "M3 S[$30*10/100]\r\nG1 F1000", "M5 S0\r\nG0")
+                };
                 while (true)
                 {
                     if (mController.IsConnected)
                     {
                         State state = mController.GetState();
-                        buttonA.Value = (state.Gamepad.Buttons & GamepadButtonFlags.A) != 0;
+
                         Data.X.Value = MapValue(state.Gamepad.LeftThumbX);
                         Data.Y.Value = MapValue(state.Gamepad.LeftThumbY);
-                        if (buttonA.Value && !buttonA.PreviousValue)
+                        Data.Power.Value = Math.Round(state.Gamepad.RightTrigger / 256.0, 1);
+
+                        List<string> commands = new List<string>();
+                        foreach (ButtonVar btn in buttons)
                         {
-                            Core.ExecuteCustomCode("M3 S[$30*10/100]\r\nG1 F1000");
+                            btn.Buttons = state.Gamepad.Buttons;
+                            string command = btn.CurrentCommand;
+                            if (string.IsNullOrEmpty(command)) commands.Add(command);
                         }
-                        if (!buttonA.Value && buttonA.PreviousValue)
-                        {
-                            Core.ExecuteCustomCode("M5 S0\r\nG0");
-                        }
+
                         double distance = Quantize(Math.Sqrt(Math.Pow(Data.X.Value, 2) + Math.Pow(Data.Y.Value, 2)));
                         if (distance > 1) distance = 1;
 
-                        Data.Power.Value = Math.Round(state.Gamepad.RightTrigger / 256.0, 1);
-                        if (Data.IsChanged)
+                        if (Data.IsChanged || commands.Count > 0)
                         {
-                            if (!Data.IsZeroPosition)
+                            foreach (string command in commands)
+                            {
+                                Core.ContinuousJogAbort();
+                                Core.ExecuteCustomCode(command);
+                            }
+                            if (!Data.IsZeroPosition || commands.Count > 0)
                             {
                                 PointF target = new PointF((float)Data.X.Value * 5000, (float)Data.Y.Value * 5000);
                                 Core.ContinuousJogToPosition(target, (float)ScaleValue(distance, 5000));
