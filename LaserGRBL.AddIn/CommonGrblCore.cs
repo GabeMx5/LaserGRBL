@@ -115,6 +115,8 @@ namespace LaserGRBL.AddIn
 
         public abstract void JogAbort();
 
+        public abstract void ContinuousJogAbort();
+
         public abstract bool CanReOpenFile { get; }
 
         public abstract bool QueueEmpty { get; }

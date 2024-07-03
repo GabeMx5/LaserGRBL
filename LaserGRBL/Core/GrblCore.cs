@@ -1635,10 +1635,18 @@ namespace LaserGRBL
 			else if (!ContinuosJogEnabled)															// continuous jog disabled
 				;                                                                                       // we can abort but we don't want
 			else                                                                                    // continuoud jog enabled
-				ContinuousJog.Abort();														               // assign jog target
-		}
+				ContinuousJog.Abort();                                                                     // assign jog target
+        }
 
-		private PointF LimitToBound(PointF target)
+        public override void ContinuousJogAbort() //da chiamare su ButtonUp
+        {
+            if (!SupportTrueJogging)                                                                // old firmware
+                return;                                                                                       // abort not supported
+
+            ContinuousJog.Abort();                                                                     // assign jog target
+        }
+
+        private PointF LimitToBound(PointF target)
 		{
 			if (Configuration.SoftLimit)
 			{

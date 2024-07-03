@@ -60,7 +60,7 @@ namespace LaserGRBL.AddInTemplate
                             }
                             else
                             {
-                                Core.JogAbort();
+                                Core.ContinuousJogAbort();
                             }
                         }
                     }
