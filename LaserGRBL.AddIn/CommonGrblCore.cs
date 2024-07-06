@@ -68,7 +68,7 @@ namespace LaserGRBL.AddIn
             OnProgramEnded?.Invoke(completed);
         }
 
-        public abstract void OpenFile(Form parent, string filename = null, bool append = false);
+        public abstract void OpenFile(string filename = null, bool append = false);
 
         public abstract int ProgramTarget { get; }
         public abstract int ProgramSent { get; }
