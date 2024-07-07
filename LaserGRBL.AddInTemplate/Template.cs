@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
 
 namespace LaserGRBL.AddInTemplate
 {
@@ -23,9 +22,6 @@ namespace LaserGRBL.AddInTemplate
             CommonImageButton button = core.AddButton("mdi-gamepad", "Open gamepad form");
             button.Enabled = true;
             button.Click += PrivateItem_Click;
-            CommonImageButton btnGenerateImageAI = core.AddButton("mdi-atom", "Generate image with AI");
-            btnGenerateImageAI.Enabled = true;
-            btnGenerateImageAI.Click += InvokeAI;
             ToolStripMenuItem privateItem = new ToolStripMenuItem
             {
                 Text = "Config"
@@ -116,15 +112,6 @@ namespace LaserGRBL.AddInTemplate
             {
                 form.ShowDialog(this);
             }
-        }
-
-        private void InvokeAI(object sender, EventArgs e)
-        {
-
-            AI.GenerateImage("Hello, world!", (filename) =>
-            {
-                Core.OpenFile(filename);
-            });
         }
 
     }

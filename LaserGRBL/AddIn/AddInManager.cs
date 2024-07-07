@@ -43,7 +43,7 @@ namespace LaserGRBL.AddIn
             if (Directory.Exists(addInFolder))
             {
                 // load all assemblies from the AddIn folder
-                var files = Directory.GetFiles(addInFolder, "*.dll");
+                var files = Directory.GetFiles(addInFolder, "*.dll", SearchOption.AllDirectories);
                 foreach (var addInFile in files)
                 {
                     // load the assembly

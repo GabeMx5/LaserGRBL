@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaserGRBL.AddIn", "LaserGRB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaserGRBL.AddInTemplate", "LaserGRBL.AddInTemplate\LaserGRBL.AddInTemplate.csproj", "{B583FD14-38B1-443A-B1E2-662387DCBC5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaserGRBL.AddIn.StableDiffusion", "LaserGRBL.AddIn.StableDiffusion\LaserGRBL.AddIn.StableDiffusion.csproj", "{84F70B04-6895-4235-B0AE-744825F6C4D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B583FD14-38B1-443A-B1E2-662387DCBC5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B583FD14-38B1-443A-B1E2-662387DCBC5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B583FD14-38B1-443A-B1E2-662387DCBC5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84F70B04-6895-4235-B0AE-744825F6C4D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84F70B04-6895-4235-B0AE-744825F6C4D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84F70B04-6895-4235-B0AE-744825F6C4D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84F70B04-6895-4235-B0AE-744825F6C4D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
