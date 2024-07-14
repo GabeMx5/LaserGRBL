@@ -1,34 +1,24 @@
-﻿using LaserGRBL.AddIn;
-using SharpDX.XInput;
+﻿using SharpDX.XInput;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace LaserGRBL.AddInTemplate
+namespace LaserGRBL.AddIn.Controller
 {
-    public class Template: AddIn.AddIn
+    public class Main: AddIn
     {
-        public override string Title => "Test LaserGRBL add-in";
+        public override string Title => "Controller";
 
-        private Controller mController;
+        private SharpDX.XInput.Controller mController;
 
         public Config Config { get; private set; } = new Config();
         public Data Data { get; private set; } = new Data();
 
-        public Template(CommonGrblCore core, ToolStripMenuItem menuItem): base(core, menuItem)
+        public Main(CommonGrblCore core, ToolStripMenuItem menuItem): base(core, menuItem)
         {
-            CommonImageButton button = core.AddButton("mdi-gamepad", "Open gamepad form");
-            button.Enabled = true;
-            button.Click += PrivateItem_Click;
-            ToolStripMenuItem privateItem = new ToolStripMenuItem
-            {
-                Text = "Config"
-            };
-            privateItem.Click += PrivateItem_Click;
-            menuItem.DropDownItems.Add(privateItem);
-            mController = new Controller(UserIndex.One);
+            mController = new SharpDX.XInput.Controller(UserIndex.One);
             Task.Factory.StartNew(() =>
             {
                 List<ButtonVar> buttons = new List<ButtonVar>() {
@@ -104,14 +94,6 @@ namespace LaserGRBL.AddInTemplate
         private double Quantize(double value)
         {
             return Math.Round(value * Config.MaxSteps, 0) / Config.MaxSteps;
-        }
-
-        private void PrivateItem_Click(object sender, EventArgs e)
-        {
-            using (FormConfig form = new FormConfig())
-            {
-                form.ShowDialog(this);
-            }
         }
 
     }

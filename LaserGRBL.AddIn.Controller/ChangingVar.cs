@@ -1,7 +1,7 @@
 ﻿using SharpDX.XInput;
 using System.Collections.Generic;
 
-namespace LaserGRBL.AddInTemplate
+namespace LaserGRBL.AddIn.Controller
 {
     public class ChangingVar<T>
     {

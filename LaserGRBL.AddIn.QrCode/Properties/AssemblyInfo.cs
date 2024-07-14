@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LaserGRBL.AddInTemplate")]
+[assembly: AssemblyTitle("LaserGRBL.AddIn.QrCode")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LaserGRBL.AddInTemplate")]
+[assembly: AssemblyProduct("LaserGRBL.AddIn.QrCode")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b583fd14-38b1-443a-b1e2-662387dcbc5a")]
+[assembly: Guid("faba3369-eef0-49a8-a05f-4b70f08797bc")]
 
 // Version information for an assembly consists of the following four values:
 //

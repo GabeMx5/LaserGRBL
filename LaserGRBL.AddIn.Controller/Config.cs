@@ -1,4 +1,4 @@
-﻿namespace LaserGRBL.AddInTemplate
+﻿namespace LaserGRBL.AddIn.Controller
 {
     public class Config
     {

@@ -9,12 +9,15 @@ namespace LaserGRBL.AddIn
 {
     public static class AddInManager
     {
+        // add-in list
         private readonly static List<AddIn> mAddIns = new List<AddIn>();
+        // current add-in folder
+        private static string mCurrentAddInFolder;
 
         internal static void LoadAddIns(ToolStripMenuItem addInMenuItemRoot, GrblCore core)
         {
+            // init flag
             bool showAddInMenu = false;
-            var addInFolder = Path.Combine(GrblCore.ExePath, "AddIn");
             // resolve all assemblies from the AddIn folder
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
@@ -25,7 +28,7 @@ namespace LaserGRBL.AddIn
                 if (assembly != null) return assembly;
                 // load the assembly from the AddIn folder
                 string filename = args.Name.Split(',')[0] + ".dll".ToLower();
-                filename = Path.Combine(addInFolder, filename);
+                filename = Path.Combine(mCurrentAddInFolder, filename);
                 if (File.Exists(filename))
                 {
                     try
@@ -39,6 +42,8 @@ namespace LaserGRBL.AddIn
                 }
                 return null;
             };
+            // get the AddIn folder
+            var addInFolder = Path.Combine(GrblCore.DataPath, "AddIn");
             // check if the AddIn folder exists
             if (Directory.Exists(addInFolder))
             {
@@ -46,6 +51,8 @@ namespace LaserGRBL.AddIn
                 var files = Directory.GetFiles(addInFolder, "*.dll", SearchOption.AllDirectories);
                 foreach (var addInFile in files)
                 {
+                    // get current folder
+                    mCurrentAddInFolder = Path.GetDirectoryName(addInFile);
                     // load the assembly
                     Assembly assembly = Assembly.LoadFile(addInFile);
                     foreach (Type type in assembly.GetTypes())
@@ -71,21 +78,8 @@ namespace LaserGRBL.AddIn
                     }
                 }
             }
+            // show the AddIn menu if some AddIns are loaded
             addInMenuItemRoot.Visible = showAddInMenu;
-        }
-
-        private static void ForEveryAddIn(Action<AddIn> action)
-        {
-            foreach (var addIn in mAddIns)
-            {
-                try
-                {
-                    action.Invoke(addIn);
-                }
-                catch
-                {
-                }
-            }
         }
 
     }
